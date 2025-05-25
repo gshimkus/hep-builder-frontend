@@ -68,7 +68,11 @@
   <h2>Formatted HEP</h2>
   <pre id="formattedOutput"></pre>
 
+  <button id="downloadBtn" style="display:none;">Download as Word</button>
+
   <script>
+    let formattedText = ""; // store the HEP text
+
     document.getElementById('hepForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -87,7 +91,26 @@
       });
 
       const result = await response.json();
-      document.getElementById('formattedOutput').textContent = result.formattedHep;
+      formattedText = result.formattedHep;
+
+      document.getElementById('formattedOutput').textContent = formattedText;
+
+      // Show the download button
+      document.getElementById('downloadBtn').style.display = 'block';
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      // Create a Blob with the HEP text
+      const blob = new Blob([formattedText], { type: "application/msword" });
+
+      // Create a link and trigger download
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "HEP.doc";
+      link.click();
+
+      // Clean up
+      URL.revokeObjectURL(link.href);
     });
   </script>
 </body>
