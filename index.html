@@ -23,6 +23,10 @@
 </header>
 
   <form id="hepForm">
+    <label>Email Address (required):
+  <input type="email" name="email" required>
+</label>
+
     <label>Focus Area:
       <select name="focusArea" required>
         <option value="">Select a focus area</option>
@@ -76,6 +80,9 @@
 
   <h2>AI HEP Output</h2>
   <pre id="formattedOutput" contenteditable="true" style="background: #f4f4f4; padding: 1rem; overflow-x: auto;"></pre>
+<p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
+  You can edit this HEP directly on the page before downloading
+</p>
 
 
   <button id="downloadBtn" style="display:none;">Download as Word</button>
