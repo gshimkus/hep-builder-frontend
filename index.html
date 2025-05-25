@@ -1,148 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>HEP Generator</title>
-  <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    label { display: block; margin-top: 1rem; }
-    select, button { margin-top: 0.5rem; }
-    pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; }
-  </style>
+<meta charset="UTF-8" />
+<title>HEP Generator</title>
+<style>
+body { font-family: sans-serif; margin: 2rem; }
+label { display: block; margin-top: 1rem; }
+select, button { margin-top: 0.5rem; }
+pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; }
+</style>
 </head>
 <body>
-  <h1>HEP Generator</h1>
+<h1>HEP Generator</h1>
 <header style="margin-bottom: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem;">
-  <h1 style="margin: 0;">AI-Powered HEP Builder</h1>
-  <p style="margin: 0.5rem 0 0 0; color: #555;">
-    Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
-  </p>
-  <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">
-    Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.
-  </p>
+<h1 style="margin: 0;">AI-Powered HEP Builder</h1>
+<p style="margin: 0.5rem 0 0 0; color: #555;">
+Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
+</p>
+<p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">
+Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.
+</p>
 </header>
 
-  <form id="hepForm">
+<form id="hepForm">
     <label>Email Address (required):
   <input type="email" name="email" required>
 </label>
 
-    <label>Focus Area:
-      <select name="focusArea" required>
-        <option value="">Select a focus area</option>
-        <option value="ankle and foot">Ankle and Foot</option>
-        <option value="cervical">Cervical</option>
-        <option value="hip">Hip</option>
-        <option value="knee">Knee</option>
-        <option value="lumbar">Lumbar</option>
-        <option value="shoulder">Shoulder</option>
-        <option value="thoracic">Thoracic</option>
-        <option value="wrist and hand">Wrist and Hand</option>
-        <option value="elbow">Elbow</option>
-        <option value="balance">Balance</option>
-        <option value="core">Core</option>
-      </select>
-    </label>
+<label>Focus Area:
+<select name="focusArea" required>
+<option value="">Select a focus area</option>
+<option value="ankle and foot">Ankle and Foot</option>
+<option value="cervical">Cervical</option>
+<option value="hip">Hip</option>
+<option value="knee">Knee</option>
+<option value="lumbar">Lumbar</option>
+<option value="shoulder">Shoulder</option>
+<option value="thoracic">Thoracic</option>
+<option value="wrist and hand">Wrist and Hand</option>
+<option value="elbow">Elbow</option>
+<option value="balance">Balance</option>
+<option value="core">Core</option>
+</select>
+</label>
 
-    <label>Difficulty Level:
-      <select name="difficulty">
-        <option value="">Select difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="easy to moderate">Easy to Moderate</option>
-        <option value="moderate">Moderate</option>
-        <option value="moderate to hard">Moderate to Hard</option>
-        <option value="hard">Hard</option>
-      </select>
-    </label>
+<label>Difficulty Level:
+<select name="difficulty">
+<option value="">Select difficulty</option>
+<option value="easy">Easy</option>
+<option value="easy to moderate">Easy to Moderate</option>
+<option value="moderate">Moderate</option>
+<option value="moderate to hard">Moderate to Hard</option>
+<option value="hard">Hard</option>
+</select>
+</label>
 
-    <label>Weight-Bearing Status:
-      <select name="weightBearing">
-        <option value="">Select WB status</option>
-        <option value="non-weight-bearing">Non-weight-bearing</option>
-        <option value="partial weight-bearing">Partial weight-bearing</option>
-        <option value="full weight-bearing">Full weight-bearing</option>
-        <option value="standing">Standing</option>
-        <option value="lying">Lying</option>
-      </select>
-    </label>
+<label>Weight-Bearing Status:
+<select name="weightBearing">
+<option value="">Select WB status</option>
+<option value="non-weight-bearing">Non-weight-bearing</option>
+<option value="partial weight-bearing">Partial weight-bearing</option>
+<option value="full weight-bearing">Full weight-bearing</option>
+<option value="standing">Standing</option>
+<option value="lying">Lying</option>
+</select>
+</label>
 
-    <label>Injury Stage:
-      <select name="injuryStage">
-        <option value="">Select stage</option>
-        <option value="acute">Acute</option>
-        <option value="subacute">Subacute</option>
-        <option value="chronic">Chronic</option>
-      </select>
-    </label>
+<label>Injury Stage:
+<select name="injuryStage">
+<option value="">Select stage</option>
+<option value="acute">Acute</option>
+<option value="subacute">Subacute</option>
+<option value="chronic">Chronic</option>
+</select>
+</label>
 
-    <button type="submit">Generate HEP</button>
-  </form>
+<button type="submit">Generate HEP</button>
+</form>
 
-  <h2>AI HEP Output</h2>
-  <pre id="formattedOutput" contenteditable="true" style="background: #f4f4f4; padding: 1rem; overflow-x: auto;"></pre>
+<h2>AI HEP Output</h2>
+<pre id="formattedOutput" contenteditable="true" style="background: #f4f4f4; padding: 1rem; overflow-x: auto;"></pre>
 <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
   You can edit this HEP directly on the page before downloading
 </p>
 
 
-  <button id="downloadBtn" style="display:none;">Download as Word</button>
+<button id="downloadBtn" style="display:none;">Download as Word</button>
 
-  <script>
-    let formattedText = ""; // store the HEP text
+<script>
+let formattedText = ""; // store the HEP text
 
-    document.getElementById('hepForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        patientData: {
-          focusArea: e.target.focusArea.value,
-          difficulty: e.target.difficulty.value,
-          weightBearing: e.target.weightBearing.value,
-          injuryStage: e.target.injuryStage.value
-        }
-      };
+document.getElementById('hepForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const data = {
+patientData: {
+focusArea: e.target.focusArea.value,
+difficulty: e.target.difficulty.value,
+weightBearing: e.target.weightBearing.value,
+injuryStage: e.target.injuryStage.value
+}
+};
 
-      const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      const result = await response.json();
-      formattedText = result.formattedHep;
-      const email = e.target.email.value; // grab the email
-const hepText = formattedText;
-
-// Post to Google Sheets
-await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
-  method: "POST",
-  body: JSON.stringify({
-    email: email,
-    hep: hepText,
-    key: "YOUR_SECRET_KEY" // optional security
-  }),
-  headers: { "Content-Type": "application/json" }
+const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(data)
 });
 
+const result = await response.json();
+formattedText = result.formattedHep;
 
-      document.getElementById('formattedOutput').textContent = formattedText;
+document.getElementById('formattedOutput').textContent = formattedText;
 
-      // Show the download button
-      document.getElementById('downloadBtn').style.display = 'block';
-    });
+// Show the download button
+document.getElementById('downloadBtn').style.display = 'block';
+});
 
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      // Create a Blob with the HEP text
-      const blob = new Blob([formattedText], { type: "application/msword" });
+document.getElementById('downloadBtn').addEventListener('click', () => {
+// Create a Blob with the HEP text
+const blob = new Blob([formattedText], { type: "application/msword" });
 
-      // Create a link and trigger download
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "HEP.doc";
-      link.click();
+// Create a link and trigger download
+const link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = "HEP.doc";
+link.click();
 
-      // Clean up
-      URL.revokeObjectURL(link.href);
-    });
-  </script>
+// Clean up
+URL.revokeObjectURL(link.href);
+});
+</script>
 </body>
 </html>
