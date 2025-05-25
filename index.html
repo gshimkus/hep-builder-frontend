@@ -109,6 +109,20 @@
 
       const result = await response.json();
       formattedText = result.formattedHep;
+      const email = e.target.email.value; // grab the email
+const hepText = formattedText;
+
+// Post to Google Sheets
+await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    email: email,
+    hep: hepText,
+    key: "YOUR_SECRET_KEY" // optional security
+  }),
+  headers: { "Content-Type": "application/json" }
+});
+
 
       document.getElementById('formattedOutput').textContent = formattedText;
 
