@@ -80,7 +80,7 @@
   <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
   <ul id="searchResults"></ul>
 
-  <h2>Formatted HEP (editable!)</h2>
+  <h2>Formatted HEP</h2>
   <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
     You can edit this HEP directly on the page before downloading.
   </p>
@@ -109,9 +109,16 @@
         const li = document.createElement("li");
         li.textContent = ex["Exercise Name"];
         li.addEventListener('click', () => {
-          manualExercises.push(ex);
-          alert(`${ex["Exercise Name"]} added!`);
-        });
+  manualExercises.push(ex);
+  alert(`${ex["Exercise Name"]} added!`);
+
+  // Append to the visible HEP if it exists
+  const formattedOutput = document.getElementById('formattedOutput');
+  if (formattedOutput.textContent.trim() !== "") {
+    formattedOutput.textContent += `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+  }
+});
+
         resultsList.appendChild(li);
       });
     });
