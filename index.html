@@ -11,11 +11,36 @@
   ul { list-style-type: none; padding: 0; }
   li { cursor: pointer; color: blue; margin: 0.25rem 0; }
   .hidden { display: none; }
-  #focusAreaDropdowns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-  .dropdown-container { border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; background: #f9f9f9; }
-  .dropdown-container label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
-  .dropdown-container select { width: 100%; }
+
+  #focusAreaDropdowns { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 0.5rem; /* Reduced gap for tighter layout */
+    margin-top: 1rem; 
+  }
+
+  .dropdown-container { 
+    border: 1px solid #ccc; 
+    padding: 0.5rem; 
+    border-radius: 4px; 
+    background: #f9f9f9; 
+    max-width: 200px; /* Limit width */
+    box-sizing: border-box; /* Prevent overflow */
+  }
+
+  .dropdown-container label { 
+    font-weight: bold; 
+    display: block; 
+    margin-bottom: 0.25rem; 
+  }
+
+  .dropdown-container select { 
+    width: 100%; 
+    font-size: 0.9rem; /* Make text smaller */
+    padding: 0.25rem; /* Reduce padding */
+  }
 </style>
+
 </head>
 <body>
 <h1>AI-Powered HEP Builder</h1>
