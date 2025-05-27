@@ -90,16 +90,16 @@
     <button type="submit">Generate HEP</button>
   </form>
 
-  <h2>Formatted HEP (editable!)</h2>
+  <h2> HEP (editable!)</h2>
   <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
     You can edit this HEP directly on the page before downloading.
   </p>
   <pre id="formattedOutput" contenteditable="true"></pre>
 
-  <h2>Or Select from Focus Area Lists:</h2>
+  <h2>Add By Focus Area:</h2>
   <div id="focusAreaDropdowns"></div>
 
-  <h2>Search and Add Exercises</h2>
+  <h2>Or Search and Add</h2>
   <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
   <ul id="searchResults"></ul>
 
@@ -112,7 +112,7 @@
 
     // Load dataset and build dropdowns
     (async () => {
-      const response = await fetch('./data/dat.json');
+      const response = await fetch('./data');
       exerciseDataset = await response.json();
 
       // Group exercises by focus area
