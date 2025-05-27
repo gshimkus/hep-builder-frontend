@@ -188,13 +188,18 @@ document.getElementById('hepForm').addEventListener('submit', async (e) => {
   const result = await response.json();
   let finalHep = result.formattedHep;
 
-  // Append manual exercises
-  if (manualExercises.length > 0) {
-    finalHep += `\n\n---\nManually Added Exercises:\n`;
-    manualExercises.forEach((ex, idx) => {
-      finalHep += `\n${idx + 1}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-    });
-  }
+  // Append manual exercises seamlessly as next numbered entries
+if (manualExercises.length > 0) {
+  // Find highest number currently in the generated HEP
+  const matches = finalHep.match(/^\d+\./gm) || [];
+  let nextNumber = matches.length > 0 ? matches.length + 1 : 1;
+
+  manualExercises.forEach((ex) => {
+    finalHep += `\n\n${nextNumber}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+    nextNumber++;
+  });
+}
+
 
   document.getElementById('formattedOutput').textContent = finalHep;
   document.getElementById('downloadBtn').classList.remove('hidden');
