@@ -82,8 +82,8 @@
   </p>
   <pre id="formattedOutput" contenteditable="true"></pre>
 
-<h2>Add Exercise by Focus Area Lists:</h2>
-<div id="focusAreaDropdowns"></div>
+<h2>Add by focus area:</h2>
+<div id="focusAreaDropdowns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
 
   <h2>Search and Add Exercises</h2>
   <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
@@ -104,7 +104,7 @@
 
 // After loading dataset
 (async () => {
-  const response = await fetch('./data'); // 
+  const response = await fetch('./data/dat.json'); // adjust if needed
   exerciseDataset = await response.json();
 
   // Group exercises by focus area
@@ -115,13 +115,26 @@
     grouped[area].push(ex);
   });
 
-  // Create dropdowns
   const dropdownsContainer = document.getElementById('focusAreaDropdowns');
-  Object.keys(grouped).forEach(area => {
-    const label = document.createElement('label');
-    label.textContent = area;
 
+  Object.keys(grouped).forEach(area => {
+    // Create a container div for each dropdown with styling
+    const container = document.createElement('div');
+    container.style.border = "1px solid #ccc";
+    container.style.padding = "0.5rem";
+    container.style.borderRadius = "4px";
+    container.style.background = "#f9f9f9";
+
+    // Create label
+    const label = document.createElement('strong');
+    label.textContent = area;
+    label.style.display = "block";
+    label.style.marginBottom = "0.25rem";
+    container.appendChild(label);
+
+    // Create select
     const select = document.createElement('select');
+    select.style.width = "100%";
     select.innerHTML = `<option value="">Select exercise</option>`;
     grouped[area].forEach(ex => {
       const opt = document.createElement('option');
@@ -130,6 +143,7 @@
       select.appendChild(opt);
     });
 
+    // Add event listener
     select.addEventListener('change', () => {
       const selectedName = select.value;
       if (!selectedName) return;
@@ -144,13 +158,14 @@
         const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
         formattedOutput.textContent += newEntry;
       }
-      select.selectedIndex = 0; // reset dropdown
+      select.selectedIndex = 0;
     });
 
-    label.appendChild(select);
-    dropdownsContainer.appendChild(label);
+    container.appendChild(select);
+    dropdownsContainer.appendChild(container);
   });
 })();
+
 
 
     // Search logic
