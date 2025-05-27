@@ -20,13 +20,13 @@
   }
 
   .dropdown-container { 
-    border: 1px solid #ccc; 
-    padding: 0.5rem; 
-    border-radius: 4px; 
-    background: #f9f9f9; 
-    max-width: 200px; /* Limit width */
-    box-sizing: border-box; /* Prevent overflow */
-  }
+  border: 1px solid #ccc; 
+  padding: 0.25rem 0.5rem; 
+  border-radius: 4px; 
+  background: #f9f9f9; 
+  max-width: 180px; 
+  box-sizing: border-box; 
+}
 
   .dropdown-container label { 
     font-weight: bold; 
@@ -34,11 +34,12 @@
     margin-bottom: 0.25rem; 
   }
 
-  .dropdown-container select { 
-    width: 100%; 
-    font-size: 0.9rem; /* Make text smaller */
-    padding: 0.25rem; /* Reduce padding */
-  }
+ .dropdown-container select { 
+  width: 100%; 
+  font-size: 0.85rem; 
+  padding: 0.2rem; 
+  margin-top: 0.25rem; 
+}
 </style>
 
 </head>
@@ -155,9 +156,12 @@ function addManualExercise(ex) {
     const container = document.createElement('div');
     container.className = "dropdown-container";
 
-    const label = document.createElement('label');
-    label.textContent = area;
-    container.appendChild(label);
+    const label = document.createElement('span');
+label.textContent = area;
+label.style.fontWeight = "bold";
+label.style.fontSize = "0.85rem";
+container.appendChild(label);
+
 
     const select = document.createElement('select');
     select.innerHTML = `<option value="">Select exercise</option>`;
