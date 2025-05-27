@@ -1,233 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>HEP Builder</title>
-  <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    label { display: block; margin-top: 1rem; }
-    select, button, input { margin-top: 0.5rem; }
-    pre { background: #f4f4f4; padding: 1rem; width: 100%; margin-top: 1rem; white-space: pre-wrap; }
-    ul { list-style-type: none; padding: 0; }
-    li { cursor: pointer; color: blue; margin: 0.25rem 0; }
-    .hidden { display: none; }
-    #focusAreaDropdowns { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 1rem; 
-      margin-top: 1rem; 
-    }
-    .dropdown-container { 
-      border: 1px solid #ccc; 
-      padding: 0.5rem; 
-      border-radius: 4px; 
-      background: #f9f9f9; 
-    }
-    .dropdown-container label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
-    .dropdown-container select { width: 100%; }
-  </style>
+<meta charset="UTF-8" />
+<title>HEP Builder</title>
+<style>
+  body { font-family: sans-serif; margin: 2rem; }
+  label { display: block; margin-top: 1rem; }
+  select, button, input { margin-top: 0.5rem; }
+  pre { background: #f4f4f4; padding: 1rem; width: 100%; margin-top: 1rem; white-space: pre-wrap; }
+  ul { list-style-type: none; padding: 0; }
+  li { cursor: pointer; color: blue; margin: 0.25rem 0; }
+  .hidden { display: none; }
+  #focusAreaDropdowns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .dropdown-container { border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; background: #f9f9f9; }
+  .dropdown-container label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
+  .dropdown-container select { width: 100%; }
+</style>
 </head>
 <body>
-  <h1>AI-Powered HEP Builder</h1>
-  <p style="color: #555; font-size: 0.95rem;">
-    Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
+<h1>AI-Powered HEP Builder</h1>
+<p style="color: #555; font-size: 0.95rem;">
+  Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
+</p>
+<p style="font-size: 0.9rem; color: #999;">Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.</p>
+
+<form id="hepForm">
+  <label>Focus Area:
+    <select name="focusArea" required>
+      <option value="">Select a focus area</option>
+      <option value="ankle and foot">Ankle and Foot</option>
+      <option value="cervical">Cervical</option>
+      <option value="hip">Hip</option>
+      <option value="knee">Knee</option>
+      <option value="lumbar">Lumbar</option>
+      <option value="shoulder">Shoulder</option>
+      <option value="thoracic">Thoracic</option>
+      <option value="wrist and hand">Wrist and Hand</option>
+      <option value="elbow">Elbow</option>
+      <option value="balance">Balance</option>
+      <option value="core">Core</option>
+    </select>
+  </label>
+
+  <button type="submit">Generate HEP</button>
+</form>
+
+<h2>HEP (editable!)</h2>
+<pre id="formattedOutput" contenteditable="true"></pre>
+
+<h2>Add By Focus Area:</h2>
+<div id="focusAreaDropdowns"></div>
+
+<h2>Or Search and Add</h2>
+<input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
+<ul id="searchResults"></ul>
+
+<button id="downloadBtn" class="hidden">Download as Word</button>
+
+<script>
+let manualExercises = [];
+let exerciseDataset = [];
+
+// Helper to add manual exercises with correct numbering
+function addManualExercise(ex) {
+  manualExercises.push(ex);
+  alert(`${ex["Exercise Name"]} added!`);
+
+  const formattedOutput = document.getElementById('formattedOutput');
+  const existingText = formattedOutput.textContent;
+
+  // Find highest number currently in the HEP
+  const matches = existingText.match(/^\d+\./gm) || [];
+  const nextNumber = matches.length > 0 ? matches.length + 1 : 1;
+
+  const newEntry = `\n\n${nextNumber}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+  formattedOutput.textContent += newEntry;
+}
+
+// Load dataset and build dropdowns
+(async () => {
+  const response = await fetch('./data');
+  exerciseDataset = await response.json();
+
+  // Group exercises by focus area
+  const grouped = {};
+  exerciseDataset.forEach(ex => {
+    const area = ex["Focus Area"] || "Other";
+    if (!grouped[area]) grouped[area] = [];
+    grouped[area].push(ex);
+  });
+
+  const dropdownsContainer = document.getElementById('focusAreaDropdowns');
+  Object.keys(grouped).forEach(area => {
+    const container = document.createElement('div');
+    container.className = "dropdown-container";
+
+    const label = document.createElement('label');
+    label.textContent = area;
+    container.appendChild(label);
+
+    const select = document.createElement('select');
+    select.innerHTML = `<option value="">Select exercise</option>`;
+    grouped[area].forEach(ex => {
+      const opt = document.createElement('option');
+      opt.value = ex["Exercise Name"];
+      opt.textContent = ex["Exercise Name"];
+      select.appendChild(opt);
+    });
+
+    select.addEventListener('change', () => {
+      const selectedName = select.value;
+      if (!selectedName) return;
+      const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
+      if (ex) addManualExercise(ex);
+      select.selectedIndex = 0;
+    });
+
+    container.appendChild(select);
+    dropdownsContainer.appendChild(container);
+  });
+})();
+
+// Search logic
+document.getElementById('exerciseSearch').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
+  const resultsList = document.getElementById('searchResults');
+  resultsList.innerHTML = "";
+  results.slice(0, 5).forEach(ex => {
+    const li = document.createElement("li");
+    li.textContent = ex["Exercise Name"];
+    li.addEventListener('click', () => addManualExercise(ex));
+    resultsList.appendChild(li);
+  });
+});
+
+// Submit form to generate HEP
+document.getElementById('hepForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = {
+    patientData: {
+      focusArea: e.target.focusArea.value
+    }
+  };
+
+  const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+  let finalHep = result.formattedHep;
+
+  // Append manual exercises
+  if (manualExercises.length > 0) {
+    finalHep += `\n\n---\nManually Added Exercises:\n`;
+    manualExercises.forEach((ex, idx) => {
+      finalHep += `\n${idx + 1}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+    });
+  }
+
+  document.getElementById('formattedOutput').textContent = finalHep;
+  document.getElementById('downloadBtn').classList.remove('hidden');
+});
+
+// Download final HEP
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const currentHep = document.getElementById('formattedOutput').innerText;
+  const blob = new Blob([currentHep], { type: "application/msword" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "HEP.doc";
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+</script>
+
+<hr style="margin-top: 3rem;" />
+<div style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #555;">
+  <p style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.5rem;">
+    Want to take your patient care to the next level?
   </p>
-  <p style="font-size: 0.9rem; color: #999;">Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.</p>
-
-  <form id="hepForm">
-    <label>Email Address (required):
-      <input type="email" name="email" required>
-    </label>
-
-    <label>Focus Area:
-      <select name="focusArea" required>
-        <option value="">Select a focus area</option>
-        <option value="ankle and foot">Ankle and Foot</option>
-        <option value="cervical">Cervical</option>
-        <option value="hip">Hip</option>
-        <option value="knee">Knee</option>
-        <option value="lumbar">Lumbar</option>
-        <option value="shoulder">Shoulder</option>
-        <option value="thoracic">Thoracic</option>
-        <option value="wrist and hand">Wrist and Hand</option>
-        <option value="elbow">Elbow</option>
-        <option value="balance">Balance</option>
-        <option value="core">Core</option>
-      </select>
-    </label>
-
-    <label>Difficulty Level:
-      <select name="difficulty">
-        <option value="">Select difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="easy to moderate">Easy to Moderate</option>
-        <option value="moderate">Moderate</option>
-        <option value="moderate to hard">Moderate to Hard</option>
-        <option value="hard">Hard</option>
-      </select>
-    </label>
-
-    <label>Weight-Bearing Status:
-      <select name="weightBearing">
-        <option value="">Select WB status</option>
-        <option value="non-weight-bearing">Non-weight-bearing</option>
-        <option value="partial weight-bearing">Partial weight-bearing</option>
-        <option value="full weight-bearing">Full weight-bearing</option>
-        <option value="standing">Standing</option>
-        <option value="lying">Lying</option>
-      </select>
-    </label>
-
-    <label>Injury Stage:
-      <select name="injuryStage">
-        <option value="">Select stage</option>
-        <option value="acute">Acute</option>
-        <option value="subacute">Subacute</option>
-        <option value="chronic">Chronic</option>
-      </select>
-    </label>
-
-    <button type="submit">Generate HEP</button>
-  </form>
-
-  <h2> HEP (editable!)</h2>
-  <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
-    You can edit this HEP directly on the page before downloading.
+  <p>
+    Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.
   </p>
-  <pre id="formattedOutput" contenteditable="true"></pre>
-
-  <h2>Add By Focus Area:</h2>
-  <div id="focusAreaDropdowns"></div>
-
-  <h2>Or Search and Add</h2>
-  <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
-  <ul id="searchResults"></ul>
-
-  <button id="downloadBtn" class="hidden">Download as Word</button>
-
-  <script>
-    let formattedText = "";
-    let manualExercises = [];
-    let exerciseDataset = [];
-
-    // Load dataset and build dropdowns
-    (async () => {
-      const response = await fetch('./data');
-      exerciseDataset = await response.json();
-
-      // Group exercises by focus area
-      const grouped = {};
-      exerciseDataset.forEach(ex => {
-        const area = ex["Focus Area"] || "Other";
-        if (!grouped[area]) grouped[area] = [];
-        grouped[area].push(ex);
-      });
-
-      const dropdownsContainer = document.getElementById('focusAreaDropdowns');
-      Object.keys(grouped).forEach(area => {
-        const container = document.createElement('div');
-        container.className = "dropdown-container";
-
-        const label = document.createElement('label');
-        label.textContent = area;
-        container.appendChild(label);
-
-        const select = document.createElement('select');
-        select.innerHTML = `<option value="">Select exercise</option>`;
-        grouped[area].forEach(ex => {
-          const opt = document.createElement('option');
-          opt.value = ex["Exercise Name"];
-          opt.textContent = ex["Exercise Name"];
-          select.appendChild(opt);
-        });
-
-        select.addEventListener('change', () => {
-          const selectedName = select.value;
-          if (!selectedName) return;
-
-          const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
-          if (ex) {
-            manualExercises.push(ex);
-            alert(`${ex["Exercise Name"]} added!`);
-
-            // Append to editable HEP area
-            const formattedOutput = document.getElementById('formattedOutput');
-            const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-            formattedOutput.textContent += newEntry;
-          }
-          select.selectedIndex = 0;
-        });
-
-        container.appendChild(select);
-        dropdownsContainer.appendChild(container);
-      });
-    })();
-
-    // Search logic
-    document.getElementById('exerciseSearch').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
-      const resultsList = document.getElementById('searchResults');
-      resultsList.innerHTML = "";
-      results.slice(0, 5).forEach(ex => {
-        const li = document.createElement("li");
-        li.textContent = ex["Exercise Name"];
-        li.addEventListener('click', () => {
-          manualExercises.push(ex);
-          alert(`${ex["Exercise Name"]} added!`);
-          const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-          document.getElementById('formattedOutput').textContent += newEntry;
-        });
-        resultsList.appendChild(li);
-      });
-    });
-
-    // Submit form to generate HEP
-    document.getElementById('hepForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        patientData: {
-          focusArea: e.target.focusArea.value,
-          difficulty: e.target.difficulty.value,
-          weightBearing: e.target.weightBearing.value,
-          injuryStage: e.target.injuryStage.value
-        },
-        manualExercises: manualExercises
-      };
-
-      const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      const result = await response.json();
-      formattedText = result.formattedHep;
-      document.getElementById('formattedOutput').textContent = formattedText;
-      document.getElementById('downloadBtn').classList.remove('hidden');
-    });
-
-    // Download final HEP
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const currentHep = document.getElementById('formattedOutput').innerText;
-      const blob = new Blob([currentHep], { type: "application/msword" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "HEP.doc";
-      link.click();
-      URL.revokeObjectURL(link.href);
-    });
-  </script>
-
-  <hr style="margin-top: 3rem;" />
-  <div style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #555;">
-    <p style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.5rem;">
-      Want to take your patient care to the next level?
-    </p>
-    <p>
-      Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.
-    </p>
-    <a href="https://www.relayrtm.com" target="_blank" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">Learn More About RTM</a>
-  </div>
+  <a href="https://www.relayrtm.com" target="_blank" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">Learn More About RTM</a>
+</div>
 </body>
 </html>
