@@ -25,22 +25,60 @@
 <p style="font-size: 0.9rem; color: #999;">Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.</p>
 
 <form id="hepForm">
-  <label>Focus Area:
-    <select name="focusArea" required>
-      <option value="">Select a focus area</option>
-      <option value="ankle and foot">Ankle and Foot</option>
-      <option value="cervical">Cervical</option>
-      <option value="hip">Hip</option>
-      <option value="knee">Knee</option>
-      <option value="lumbar">Lumbar</option>
-      <option value="shoulder">Shoulder</option>
-      <option value="thoracic">Thoracic</option>
-      <option value="wrist and hand">Wrist and Hand</option>
-      <option value="elbow">Elbow</option>
-      <option value="balance">Balance</option>
-      <option value="core">Core</option>
-    </select>
-  </label>
+    <label>Email Address (required):
+      <input type="email" name="email" required>
+    </label>
+
+    <label>Focus Area:
+      <select name="focusArea" required>
+        <option value="">Select a focus area</option>
+        <option value="ankle and foot">Ankle and Foot</option>
+        <option value="cervical">Cervical</option>
+        <option value="hip">Hip</option>
+        <option value="knee">Knee</option>
+        <option value="lumbar">Lumbar</option>
+        <option value="shoulder">Shoulder</option>
+        <option value="thoracic">Thoracic</option>
+        <option value="wrist and hand">Wrist and Hand</option>
+        <option value="elbow">Elbow</option>
+        <option value="balance">Balance</option>
+        <option value="core">Core</option>
+      </select>
+    </label>
+
+    <label>Difficulty Level:
+      <select name="difficulty">
+        <option value="">Select difficulty</option>
+        <option value="easy">Easy</option>
+        <option value="easy to moderate">Easy to Moderate</option>
+        <option value="moderate">Moderate</option>
+        <option value="moderate to hard">Moderate to Hard</option>
+        <option value="hard">Hard</option>
+      </select>
+    </label>
+
+    <label>Weight-Bearing Status:
+      <select name="weightBearing">
+        <option value="">Select WB status</option>
+        <option value="non-weight-bearing">Non-weight-bearing</option>
+        <option value="partial weight-bearing">Partial weight-bearing</option>
+        <option value="full weight-bearing">Full weight-bearing</option>
+        <option value="standing">Standing</option>
+        <option value="lying">Lying</option>
+      </select>
+    </label>
+
+    <label>Injury Stage:
+      <select name="injuryStage">
+        <option value="">Select stage</option>
+        <option value="acute">Acute</option>
+        <option value="subacute">Subacute</option>
+        <option value="chronic">Chronic</option>
+      </select>
+    </label>
+
+    <button type="submit">Generate HEP</button>
+  </form>
 
   <button type="submit">Generate HEP</button>
 </form>
