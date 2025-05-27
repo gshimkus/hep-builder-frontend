@@ -77,13 +77,10 @@
       </select>
     </label>
 
-    <button type="submit">Generate HEP</button>
-  </form>
-
   <button type="submit">Generate HEP</button>
 </form>
 
-<h2>HEP (editable!)</h2>
+<h2>HEP </h2>
 <pre id="formattedOutput" contenteditable="true"></pre>
 
 <h2>Add By Focus Area:</h2>
@@ -191,17 +188,17 @@ document.getElementById('hepForm').addEventListener('submit', async (e) => {
   const result = await response.json();
   let finalHep = result.formattedHep;
 
-  // Append manual exercises
-  if (manualExercises.length > 0) {
-    finalHep += `\n\n---\nManually Added Exercises:\n`;
-    manualExercises.forEach((ex, idx) => {
-      finalHep += `\n${idx + 1}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-    });
-  }
+  // Append manual exercises seamlessly as next numbered entries
+if (manualExercises.length > 0) {
+  // Find highest number currently in the generated HEP
+  const matches = finalHep.match(/^\d+\./gm) || [];
+  let nextNumber = matches.length > 0 ? matches.length + 1 : 1;
 
-  document.getElementById('formattedOutput').textContent = finalHep;
-  document.getElementById('downloadBtn').classList.remove('hidden');
-});
+  manualExercises.forEach((ex) => {
+    finalHep += `\n\n${nextNumber}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+    nextNumber++;
+  });
+}
 
 // Download final HEP
 document.getElementById('downloadBtn').addEventListener('click', () => {
