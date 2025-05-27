@@ -82,6 +82,9 @@
   </p>
   <pre id="formattedOutput" contenteditable="true"></pre>
 
+<h2>Add Exercise by Focus Area Lists:</h2>
+<div id="focusAreaDropdowns"></div>
+
   <h2>Search and Add Exercises</h2>
   <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
   <ul id="searchResults"></ul>
@@ -98,6 +101,57 @@
       const response = await fetch('./data');
       exerciseDataset = await response.json();
     })();
+
+// After loading dataset
+(async () => {
+  const response = await fetch('./data'); // 
+  exerciseDataset = await response.json();
+
+  // Group exercises by focus area
+  const grouped = {};
+  exerciseDataset.forEach(ex => {
+    const area = ex["Focus Area"] || "Other";
+    if (!grouped[area]) grouped[area] = [];
+    grouped[area].push(ex);
+  });
+
+  // Create dropdowns
+  const dropdownsContainer = document.getElementById('focusAreaDropdowns');
+  Object.keys(grouped).forEach(area => {
+    const label = document.createElement('label');
+    label.textContent = area;
+
+    const select = document.createElement('select');
+    select.innerHTML = `<option value="">Select exercise</option>`;
+    grouped[area].forEach(ex => {
+      const opt = document.createElement('option');
+      opt.value = ex["Exercise Name"];
+      opt.textContent = ex["Exercise Name"];
+      select.appendChild(opt);
+    });
+
+    select.addEventListener('change', () => {
+      const selectedName = select.value;
+      if (!selectedName) return;
+
+      const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
+      if (ex) {
+        manualExercises.push(ex);
+        alert(`${ex["Exercise Name"]} added!`);
+
+        // Append to editable HEP area
+        const formattedOutput = document.getElementById('formattedOutput');
+        const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+        formattedOutput.textContent += newEntry;
+      }
+      select.selectedIndex = 0; // reset dropdown
+    });
+
+    label.appendChild(select);
+    dropdownsContainer.appendChild(label);
+  });
+})();
+
 
     // Search logic
     document.getElementById('exerciseSearch').addEventListener('input', (e) => {
