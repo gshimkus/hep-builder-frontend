@@ -7,10 +7,24 @@
     body { font-family: sans-serif; margin: 2rem; }
     label { display: block; margin-top: 1rem; }
     select, button, input { margin-top: 0.5rem; }
-    pre, textarea { background: #f4f4f4; padding: 1rem; width: 100%; margin-top: 1rem; }
+    pre { background: #f4f4f4; padding: 1rem; width: 100%; margin-top: 1rem; white-space: pre-wrap; }
     ul { list-style-type: none; padding: 0; }
     li { cursor: pointer; color: blue; margin: 0.25rem 0; }
     .hidden { display: none; }
+    #focusAreaDropdowns { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+      gap: 1rem; 
+      margin-top: 1rem; 
+    }
+    .dropdown-container { 
+      border: 1px solid #ccc; 
+      padding: 0.5rem; 
+      border-radius: 4px; 
+      background: #f9f9f9; 
+    }
+    .dropdown-container label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
+    .dropdown-container select { width: 100%; }
   </style>
 </head>
 <body>
@@ -76,14 +90,14 @@
     <button type="submit">Generate HEP</button>
   </form>
 
-  <h2>Formatted HEP</h2>
+  <h2>Formatted HEP (editable!)</h2>
   <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
     You can edit this HEP directly on the page before downloading.
   </p>
   <pre id="formattedOutput" contenteditable="true"></pre>
 
-<h2>Add by focus area:</h2>
-<div id="focusAreaDropdowns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
+  <h2>Or Select from Focus Area Lists:</h2>
+  <div id="focusAreaDropdowns"></div>
 
   <h2>Search and Add Exercises</h2>
   <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
@@ -96,77 +110,58 @@
     let manualExercises = [];
     let exerciseDataset = [];
 
-    // Load dataset for manual search
+    // Load dataset and build dropdowns
     (async () => {
-      const response = await fetch('./data');
+      const response = await fetch('./data/dat.json');
       exerciseDataset = await response.json();
+
+      // Group exercises by focus area
+      const grouped = {};
+      exerciseDataset.forEach(ex => {
+        const area = ex["Focus Area"] || "Other";
+        if (!grouped[area]) grouped[area] = [];
+        grouped[area].push(ex);
+      });
+
+      const dropdownsContainer = document.getElementById('focusAreaDropdowns');
+      Object.keys(grouped).forEach(area => {
+        const container = document.createElement('div');
+        container.className = "dropdown-container";
+
+        const label = document.createElement('label');
+        label.textContent = area;
+        container.appendChild(label);
+
+        const select = document.createElement('select');
+        select.innerHTML = `<option value="">Select exercise</option>`;
+        grouped[area].forEach(ex => {
+          const opt = document.createElement('option');
+          opt.value = ex["Exercise Name"];
+          opt.textContent = ex["Exercise Name"];
+          select.appendChild(opt);
+        });
+
+        select.addEventListener('change', () => {
+          const selectedName = select.value;
+          if (!selectedName) return;
+
+          const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
+          if (ex) {
+            manualExercises.push(ex);
+            alert(`${ex["Exercise Name"]} added!`);
+
+            // Append to editable HEP area
+            const formattedOutput = document.getElementById('formattedOutput');
+            const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+            formattedOutput.textContent += newEntry;
+          }
+          select.selectedIndex = 0;
+        });
+
+        container.appendChild(select);
+        dropdownsContainer.appendChild(container);
+      });
     })();
-
-// After loading dataset
-(async () => {
-  const response = await fetch('./data/dat.json'); // adjust if needed
-  exerciseDataset = await response.json();
-
-  // Group exercises by focus area
-  const grouped = {};
-  exerciseDataset.forEach(ex => {
-    const area = ex["Focus Area"] || "Other";
-    if (!grouped[area]) grouped[area] = [];
-    grouped[area].push(ex);
-  });
-
-  const dropdownsContainer = document.getElementById('focusAreaDropdowns');
-
-  Object.keys(grouped).forEach(area => {
-    // Create a container div for each dropdown with styling
-    const container = document.createElement('div');
-    container.style.border = "1px solid #ccc";
-    container.style.padding = "0.5rem";
-    container.style.borderRadius = "4px";
-    container.style.background = "#f9f9f9";
-
-    // Create label
-    const label = document.createElement('strong');
-    label.textContent = area;
-    label.style.display = "block";
-    label.style.marginBottom = "0.25rem";
-    container.appendChild(label);
-
-    // Create select
-    const select = document.createElement('select');
-    select.style.width = "100%";
-    select.innerHTML = `<option value="">Select exercise</option>`;
-    grouped[area].forEach(ex => {
-      const opt = document.createElement('option');
-      opt.value = ex["Exercise Name"];
-      opt.textContent = ex["Exercise Name"];
-      select.appendChild(opt);
-    });
-
-    // Add event listener
-    select.addEventListener('change', () => {
-      const selectedName = select.value;
-      if (!selectedName) return;
-
-      const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
-      if (ex) {
-        manualExercises.push(ex);
-        alert(`${ex["Exercise Name"]} added!`);
-
-        // Append to editable HEP area
-        const formattedOutput = document.getElementById('formattedOutput');
-        const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-        formattedOutput.textContent += newEntry;
-      }
-      select.selectedIndex = 0;
-    });
-
-    container.appendChild(select);
-    dropdownsContainer.appendChild(container);
-  });
-})();
-
-
 
     // Search logic
     document.getElementById('exerciseSearch').addEventListener('input', (e) => {
@@ -178,22 +173,16 @@
         const li = document.createElement("li");
         li.textContent = ex["Exercise Name"];
         li.addEventListener('click', () => {
-  manualExercises.push(ex);
-  alert(`${ex["Exercise Name"]} added!`);
-
-  // Format the exercise text for direct insertion
-  const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
-
-  // Append to the current text in the editable HEP field
-  const formattedOutput = document.getElementById('formattedOutput');
-  formattedOutput.textContent += newEntry;
-});
-
+          manualExercises.push(ex);
+          alert(`${ex["Exercise Name"]} added!`);
+          const newEntry = `\n\n${manualExercises.length}. ${ex["Exercise Name"]}\n   - Description: ${ex["Patient-Friendly Description"]}\n   - Equipment: ${ex["Equipment Needed"] || "None"}\n   - Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}\n   - Notes: ${ex["Progression/Regression"] || ""}`;
+          document.getElementById('formattedOutput').textContent += newEntry;
+        });
         resultsList.appendChild(li);
       });
     });
 
-    // Submit form to generate HEP (including manual exercises)
+    // Submit form to generate HEP
     document.getElementById('hepForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -203,7 +192,7 @@
           weightBearing: e.target.weightBearing.value,
           injuryStage: e.target.injuryStage.value
         },
-        manualExercises: manualExercises // include any manual adds
+        manualExercises: manualExercises
       };
 
       const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
@@ -214,12 +203,11 @@
 
       const result = await response.json();
       formattedText = result.formattedHep;
-
       document.getElementById('formattedOutput').textContent = formattedText;
       document.getElementById('downloadBtn').classList.remove('hidden');
     });
 
-    // Download final HEP (including any edits and any manual additions AFTER generation)
+    // Download final HEP
     document.getElementById('downloadBtn').addEventListener('click', () => {
       const currentHep = document.getElementById('formattedOutput').innerText;
       const blob = new Blob([currentHep], { type: "application/msword" });
