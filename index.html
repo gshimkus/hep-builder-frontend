@@ -27,6 +27,14 @@
     padding-left: 2rem;
   }
 
+  /* HEP output area border */
+  #hepOutput {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
   /* Spacing in dropdowns */
   #focusAreaDropdowns {
     margin-top: 0.5rem;
@@ -67,6 +75,7 @@
 <div class="flex-container">
   <!-- Generator form and HEP editor -->
   <div class="generator">
+    <h2>Auto Generator</h2>
     <form id="hepForm">
       <label>Email Address (required):
         <input type="email" name="email" required>
@@ -146,6 +155,7 @@
 </div>
 
 <script>
+// existing JavaScript code (unchanged!)
 let manualExercises = [];
 let exerciseDataset = [];
 
@@ -267,7 +277,6 @@ function renderHepOutput(hepPlan = manualExercises) {
   });
 }
 
-// Print as PDF
 document.getElementById('printBtn').addEventListener('click', () => {
   window.print();
 });
