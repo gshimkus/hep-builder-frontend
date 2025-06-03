@@ -9,29 +9,31 @@
   select, button, input { margin-top: 0.5rem; }
   ul { list-style-type: none; padding: 0; }
   li { cursor: pointer; color: blue; margin: 0.25rem 0; }
-  .hidden { display: none; }
   .exercise-block { border-bottom: 1px solid #ddd; padding: 0.5rem 0; }
   .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
   .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
 
-  /* Add spacing between dropdowns and titles */
-  #focusAreaDropdowns {
-    margin-top: 0.5rem;
+  /* Flex layout for side-by-side panels */
+  .flex-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
   }
-  #focusAreaDropdowns .dropdown-container {
-    margin-top: 0.5rem;
+  .generator, .focus-areas {
+    flex: 1;
   }
-  h2 {
-    margin-bottom: 0.25rem;
+  .focus-areas {
+    border-left: 2px solid #ccc;
+    padding-left: 2rem;
   }
 
-#focusAreaDropdowns {
+  /* Spacing in dropdowns */
+  #focusAreaDropdowns {
     margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; /* Adds spacing between each dropdown */
+    gap: 0.5rem;
   }
-
   .dropdown-container {
     display: flex;
     flex-direction: column;
@@ -42,24 +44,13 @@
     margin-bottom: 0.25rem;
   }
 
-
   /* Print-specific styles */
   @media print {
-    body * {
-      visibility: hidden;
-    }
-    #hepOutput, #hepOutput * {
-      visibility: visible;
-    }
+    body * { visibility: hidden; }
+    #hepOutput, #hepOutput * { visibility: visible; }
     #hepOutput {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      margin: 0;
-      padding: 1rem;
-      background: #fff;
-      color: #000;
+      position: absolute; left: 0; top: 0; width: 100%;
+      margin: 0; padding: 1rem; background: #fff; color: #000;
     }
   }
 </style>
@@ -73,84 +64,86 @@
   <p style="font-size: 0.9rem; color: #999;">Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.</p>
 </div>
 
-<form id="hepForm">
-  <label>Email Address (required):
-    <input type="email" name="email" required>
-  </label>
+<div class="flex-container">
+  <!-- Generator form and HEP editor -->
+  <div class="generator">
+    <form id="hepForm">
+      <label>Email Address (required):
+        <input type="email" name="email" required>
+      </label>
+      <label>Focus Area:
+        <select name="focusArea" required>
+          <option value="">Select a focus area</option>
+          <option value="ankle and foot">Ankle and Foot</option>
+          <option value="cervical">Cervical</option>
+          <option value="hip">Hip</option>
+          <option value="knee">Knee</option>
+          <option value="lumbar">Lumbar</option>
+          <option value="shoulder">Shoulder</option>
+          <option value="thoracic">Thoracic</option>
+          <option value="wrist and hand">Wrist and Hand</option>
+          <option value="elbow">Elbow</option>
+          <option value="balance">Balance</option>
+          <option value="core">Core</option>
+        </select>
+      </label>
+      <label>Difficulty Level:
+        <select name="difficulty">
+          <option value="">Select difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="easy to moderate">Easy to Moderate</option>
+          <option value="moderate">Moderate</option>
+          <option value="moderate to hard">Moderate to Hard</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <label>Weight-Bearing Status:
+        <select name="weightBearing">
+          <option value="">Select WB status</option>
+          <option value="non-weight-bearing">Non-weight-bearing</option>
+          <option value="partial weight-bearing">Partial weight-bearing</option>
+          <option value="full weight-bearing">Full weight-bearing</option>
+        </select>
+      </label>
+      <label>Injury Stage:
+        <select name="injuryStage">
+          <option value="">Select stage</option>
+          <option value="acute">Acute</option>
+          <option value="subacute">Subacute</option>
+          <option value="chronic">Chronic</option>
+        </select>
+      </label>
+      <label>Position:
+        <select name="position">
+          <option value="">Select position</option>
+          <option value="lying">Lying</option>
+          <option value="seated">Seated</option>
+          <option value="standing">Standing</option>
+          <option value="standing with support">Standing with Support</option>
+        </select>
+      </label>
+      <button type="submit">Generate HEP</button>
+    </form>
 
-  <label>Focus Area:
-    <select name="focusArea" required>
-      <option value="">Select a focus area</option>
-      <option value="ankle and foot">Ankle and Foot</option>
-      <option value="cervical">Cervical</option>
-      <option value="hip">Hip</option>
-      <option value="knee">Knee</option>
-      <option value="lumbar">Lumbar</option>
-      <option value="shoulder">Shoulder</option>
-      <option value="thoracic">Thoracic</option>
-      <option value="wrist and hand">Wrist and Hand</option>
-      <option value="elbow">Elbow</option>
-      <option value="balance">Balance</option>
-      <option value="core">Core</option>
-    </select>
-  </label>
+    <h2>HEP Editor</h2>
+    <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
+      Your plan will display here with images and descriptions.
+      <br><em>Click any block to edit text directly!</em>
+    </p>
+    <div id="hepOutput" contenteditable="true"></div>
+    <button id="printBtn">Print / Save as PDF</button>
+  </div>
 
-  <label>Difficulty Level:
-    <select name="difficulty">
-      <option value="">Select difficulty</option>
-      <option value="easy">Easy</option>
-      <option value="easy to moderate">Easy to Moderate</option>
-      <option value="moderate">Moderate</option>
-      <option value="moderate to hard">Moderate to Hard</option>
-      <option value="hard">Hard</option>
-    </select>
-  </label>
+  <!-- Focus Area dropdowns -->
+  <div class="focus-areas">
+    <h2>Add By Focus Area:</h2>
+    <div id="focusAreaDropdowns"></div>
 
-  <label>Weight-Bearing Status:
-    <select name="weightBearing">
-      <option value="">Select WB status</option>
-      <option value="non-weight-bearing">Non-weight-bearing</option>
-      <option value="partial weight-bearing">Partial weight-bearing</option>
-      <option value="full weight-bearing">Full weight-bearing</option>
-    </select>
-  </label>
-
-  <label>Injury Stage:
-    <select name="injuryStage">
-      <option value="">Select stage</option>
-      <option value="acute">Acute</option>
-      <option value="subacute">Subacute</option>
-      <option value="chronic">Chronic</option>
-    </select>
-  </label>
-
-  <label>Position:
-    <select name="position">
-      <option value="">Select position</option>
-      <option value="lying">Lying</option>
-      <option value="seated">Seated</option>
-      <option value="standing">Standing</option>
-      <option value="standing with support">Standing with Support</option>
-    </select>
-  </label>
-
-  <button type="submit">Generate HEP</button>
-</form>
-
-<h2>Add By Focus Area:</h2>
-<div id="focusAreaDropdowns"></div>
-
-<h2>Or Search and Add</h2>
-<input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
-<ul id="searchResults"></ul>
-
-<h2>HEP Editor</h2>
-<p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
-  Your plan will display here with images and descriptions.
-  <br><em>Click any block to edit text directly!</em>
-</p>
-<div id="hepOutput" contenteditable="true"></div>
-<button id="printBtn">Print / Save as PDF</button>
+    <h2>Or Search and Add</h2>
+    <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
+    <ul id="searchResults"></ul>
+  </div>
+</div>
 
 <script>
 let manualExercises = [];
