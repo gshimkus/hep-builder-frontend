@@ -206,7 +206,7 @@ function addManualExercise(ex) {
     image: ex["Image URL"] || ""
   };
   manualExercises.push(unifiedEx);
-  alert(${unifiedEx.name} added!);
+  alert(`${unifiedEx.name} added!`);
   renderHepOutput();
 }
 
@@ -233,7 +233,7 @@ function addManualExercise(ex) {
     container.appendChild(label);
 
     const select = document.createElement('select');
-    select.innerHTML = <option value="">Select exercise</option>;
+    select.innerHTML = `<option value="">Select exercise</option>`;
     grouped[area].forEach(ex => {
       const opt = document.createElement('option');
       opt.value = ex["Exercise Name"];
@@ -319,14 +319,14 @@ function renderHepOutput(hepPlan = manualExercises) {
     const block = document.createElement('div');
     block.className = "exercise-block";
     block.contentEditable = true;
-    block.innerHTML = 
+    block.innerHTML = `
       <strong>${idx + 1}. ${ex.name}</strong><br>
       <em>${ex.description}</em><br>
       <span>Equipment: ${ex.equipment}</span><br>
       <span>Sets/Reps: ${ex.setsReps}</span><br>
       <span>Notes: ${ex.notes}</span><br>
-      ${ex.image ? <img src="${ex.image}" alt="${ex.name}"> : ""}
-    ;
+      ${ex.image ? `<img src="${ex.image}" alt="${ex.name}">` : ""}
+    `;
     hepOutput.appendChild(block);
   });
 }
