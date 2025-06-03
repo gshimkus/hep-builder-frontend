@@ -107,8 +107,18 @@ let manualExercises = [];
 let exerciseDataset = [];
 
 function addManualExercise(ex) {
-  manualExercises.push(ex);
-  alert(`${ex["Exercise Name"]} added!`);
+  // Normalize to the same field names as auto-generated
+  const unifiedEx = {
+    name: ex["Exercise Name"],
+    description: ex["Patient-Friendly Description"],
+    equipment: ex["Equipment Needed"] || "None",
+    setsReps: ex["Typical Sets/Reps/Frequency"],
+    notes: ex["Progression/Regression"] || "",
+    image: ex["Image URL"] || ""
+  };
+  manualExercises.push(unifiedEx);
+  alert(`${unifiedEx.name} added!`);
+  renderHepOutput();
 }
 
 // Load dataset and build dropdowns
@@ -156,6 +166,20 @@ function addManualExercise(ex) {
   });
 })();
 
+// Search logic
+document.getElementById('exerciseSearch').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
+  const resultsList = document.getElementById('searchResults');
+  resultsList.innerHTML = "";
+  results.slice(0, 5).forEach(ex => {
+    const li = document.createElement("li");
+    li.textContent = ex["Exercise Name"];
+    li.addEventListener('click', () => addManualExercise(ex));
+    resultsList.appendChild(li);
+  });
+});
+
 document.getElementById('hepForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = {
@@ -177,30 +201,32 @@ document.getElementById('hepForm').addEventListener('submit', async (e) => {
   const result = await response.json();
   let hepPlan = result.hepPlan || [];
 
-  // Append manual exercises
+  // Combine manual exercises and auto-generated
   if (manualExercises.length > 0) {
     hepPlan = hepPlan.concat(manualExercises);
   }
 
-  // Render HEP output with images
+  renderHepOutput(hepPlan);
+  document.getElementById('downloadBtn').classList.remove('hidden');
+});
+
+function renderHepOutput(hepPlan = manualExercises) {
   const hepOutput = document.getElementById('hepOutput');
-  hepOutput.innerHTML = ""; // Clear previous
+  hepOutput.innerHTML = "";
   hepPlan.forEach((ex, idx) => {
     const block = document.createElement('div');
     block.className = "exercise-block";
     block.innerHTML = `
-      <strong>${idx + 1}. ${ex["Exercise Name"]}</strong><br>
-      <em>${ex["Patient-Friendly Description"]}</em><br>
-      <span>Equipment: ${ex["Equipment Needed"] || "None"}</span><br>
-      <span>Sets/Reps: ${ex["Typical Sets/Reps/Frequency"]}</span><br>
-      <span>Notes: ${ex["Progression/Regression"] || ""}</span><br>
-      ${ex["Image URL"] ? `<img src="${ex["Image URL"]}" alt="${ex["Exercise Name"]}">` : ""}
+      <strong>${idx + 1}. ${ex.name}</strong><br>
+      <em>${ex.description}</em><br>
+      <span>Equipment: ${ex.equipment}</span><br>
+      <span>Sets/Reps: ${ex.setsReps}</span><br>
+      <span>Notes: ${ex.notes}</span><br>
+      ${ex.image ? `<img src="${ex.image}" alt="${ex.name}">` : ""}
     `;
     hepOutput.appendChild(block);
   });
-
-  document.getElementById('downloadBtn').classList.remove('hidden');
-});
+}
 
 // Download final HEP
 document.getElementById('downloadBtn').addEventListener('click', () => {
