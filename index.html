@@ -242,15 +242,20 @@ document.getElementById('hepForm').addEventListener('submit', async (e) => {
   // Show loading spinner
   document.getElementById('loadingSpinner').style.display = 'block';
 
-  const data = {
-    patientData: {
-      email: e.target.email.value,
-      focusArea: e.target.focusArea.value,
-      difficulty: e.target.difficulty.value,
-      weightBearing: e.target.weightBearing.value,
-      injuryStage: e.target.injuryStage.value
-    }
-  };
+  const token = document.querySelector('.cf-turnstile [name="cf-turnstile-response"]')?.value;
+
+const data = {
+  patientData: {
+    email: e.target.email.value,
+    focusArea: e.target.focusArea.value,
+    difficulty: e.target.difficulty.value,
+    weightBearing: e.target.weightBearing.value,
+    injuryStage: e.target.injuryStage.value,
+    position: e.target.position.value
+  },
+  turnstileToken: token
+};
+
 
   try {
     const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
