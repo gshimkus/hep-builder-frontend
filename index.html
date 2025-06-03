@@ -2,68 +2,82 @@
 <html lang="en">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <head>
-<meta charset="UTF-8" />
-<title>HEP Builder</title>
-<style>
-  body { font-family: sans-serif; margin: 2rem; }
-  label { display: block; margin-top: 1rem; }
-  select, button, input { margin-top: 0.5rem; }
-  ul { list-style-type: none; padding: 0; }
-  li { cursor: pointer; color: blue; margin: 0.25rem 0; }
-  .exercise-block { border-bottom: 1px solid #ddd; padding: 0.5rem 0; }
-  .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
-  .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  /* Flex layout for side-by-side panels */
-  .flex-container {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-  }
-  .generator, .focus-areas {
-    flex: 1;
-  }
-  .focus-areas {
-    border-left: 2px solid #ccc;
-    padding-left: 2rem;
-  }
+  <title>EasyHEP – Free Physical Therapy Home Exercise Program Generator</title>
+  <meta name="description" content="Generate and customize physical therapy HEPs instantly. Free, fast, and printable with images. No login required.">
 
-  /* HEP output area border */
-  #hepOutput {
-    border: 2px solid #007bff;
-    border-radius: 4px;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-  }
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="EasyHEP – Free Physical Therapy Home Exercise Program Generator" />
+  <meta property="og:description" content="Generate physical therapy home exercise programs with AI. Download or print HEPs with images." />
+  <meta property="og:url" content="https://easyhep.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://easyhep.com/og-image.png" />
 
-  /* Spacing in dropdowns */
-  #focusAreaDropdowns {
-    margin-top: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .dropdown-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://easyhep.com/" />
 
-  h2 {
-    margin-bottom: 0.25rem;
-  }
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-  /* Print-specific styles */
-  @media print {
-    body * { visibility: hidden; }
-    #hepOutput, #hepOutput * { visibility: visible; }
-    #hepOutput {
-      position: absolute; left: 0; top: 0; width: 100%;
-      margin: 0; padding: 1rem; background: #fff; color: #000;
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    label { display: block; margin-top: 1rem; }
+    select, button, input { margin-top: 0.5rem; }
+    ul { list-style-type: none; padding: 0; }
+    li { cursor: pointer; color: blue; margin: 0.25rem 0; }
+    .exercise-block { border-bottom: 1px solid #ddd; padding: 0.5rem 0; }
+    .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
+    .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
+
+    .flex-container {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
     }
-  }
-</style>
+    .generator, .focus-areas {
+      flex: 1;
+    }
+    .focus-areas {
+      border-left: 2px solid #ccc;
+      padding-left: 2rem;
+    }
+
+    #hepOutput {
+      border: 2px solid #007bff;
+      border-radius: 4px;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    #focusAreaDropdowns {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .dropdown-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    h2 {
+      margin-bottom: 0.25rem;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #hepOutput, #hepOutput * { visibility: visible; }
+      #hepOutput {
+        position: absolute; left: 0; top: 0; width: 100%;
+        margin: 0; padding: 1rem; background: #fff; color: #000;
+      }
+    }
+  </style>
 </head>
+
 <body>
 <div style="background: #e6f7e6; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
   <h1>Home Exercise Program Generator</h1>
