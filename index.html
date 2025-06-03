@@ -230,14 +230,21 @@ function renderHepOutput(hepPlan = manualExercises) {
 
 // Download final HEP
 document.getElementById('downloadBtn').addEventListener('click', () => {
-  const currentHep = document.getElementById('hepOutput').innerText;
-  const blob = new Blob([currentHep], { type: "application/msword" });
+  const hepOutputHTML = document.getElementById('hepOutput').innerHTML;
+  const htmlContent = `
+    <html>
+    <head><meta charset="UTF-8"><title>HEP Export</title></head>
+    <body>${hepOutputHTML}</body>
+    </html>
+  `;
+  const blob = new Blob([htmlContent], { type: "text/html" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "HEP.doc";
+  link.download = "HEP.html";
   link.click();
   URL.revokeObjectURL(link.href);
 });
+
 </script>
 
 <hr style="margin-top: 3rem;" />
