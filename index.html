@@ -314,7 +314,12 @@ const data = {
 
 function renderHepOutput(hepPlan = manualExercises) {
   const hepOutput = document.getElementById('hepOutput');
-  hepOutput.innerHTML = "";
+  hepOutput.innerHTML = `
+  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+    <img src="favicon.png" alt="EasyHEP Logo" style="width: 48px; height: 48px; border-radius: 8px;">
+    <h2 style="margin: 0;">EasyHEP.com – Home Exercise Program</h2>
+  </div>
+`;
   hepPlan.forEach((ex, idx) => {
     const block = document.createElement('div');
     block.className = "exercise-block";
