@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>EasyHEP – Free Physical Therapy Home Exercise Program Generator</title>
   <meta name="description" content="Generate and customize physical therapy HEPs instantly. Free, fast, and printable with images. No login required.">
+
+  <!-- Open Graph / Social -->
   <meta property="og:title" content="EasyHEP – Free Physical Therapy Home Exercise Program Generator" />
   <meta property="og:description" content="Generate physical therapy home exercise programs with AI. Download or print HEPs with images." />
   <meta property="og:url" content="https://easyhep.com" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://easyhep.com/og-image.png" />
+
+  <!-- Canonical URL -->
   <link rel="canonical" href="https://easyhep.com/" />
-  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <style>
@@ -25,39 +31,39 @@
     .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
     .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
 
-    #pageIcon { position: fixed; top: 1rem; right: 1rem; z-index: 1000; }
-    #pageIcon img { width: 64px; height: 64px; border-radius: 12px; }
+#pageIcon {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
 
-    .flex-container { display: flex; gap: 2rem; align-items: flex-start; }
-    .generator, .focus-areas { flex: 1; }
-    .focus-areas { border-left: 2px solid #ccc; padding-left: 2rem; }
+#pageIcon img {
+  width: 64px;       
+  height: 64px;
+  border-radius: 12px;
+}
+
+
+
+    .flex-container {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+    .generator, .focus-areas {
+      flex: 1;
+    }
+    .focus-areas {
+      border-left: 2px solid #ccc;
+      padding-left: 2rem;
+    }
 
     #hepOutput {
       border: 2px solid #007bff;
       border-radius: 4px;
       padding: 0.5rem;
       margin-top: 0.5rem;
-    }
-
-    #hepOutput .hep-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 0.5rem;
-    }
-
-    #hepOutput .hep-header img {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-    }
-
-    #hepOutput .hep-header span {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #007bff;
     }
 
     #focusAreaDropdowns {
@@ -72,7 +78,9 @@
       align-items: flex-start;
     }
 
-    h2 { margin-bottom: 0.25rem; }
+    h2 {
+      margin-bottom: 0.25rem;
+    }
 
     @media print {
       body * { visibility: hidden; }
@@ -82,8 +90,11 @@
         margin: 0; padding: 1rem; background: #fff; color: #000;
       }
     }
+<link rel="icon" type="image/png" href="favicon.png">
+
   </style>
 </head>
+
 <body>
 <div style="background: #e6f7e6; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
   <h1>Home Exercise Program Generator</h1>
@@ -94,41 +105,250 @@
 </div>
 
 <div class="flex-container">
+  <!-- Generator form and HEP editor -->
   <div class="generator">
     <h2>Auto Generator</h2>
     <form id="hepForm">
-      <!-- form fields -->
+      <label>Email Address (required):
+        <input type="email" name="email" required>
+      </label>
+      <label>Focus Area:
+        <select name="focusArea" required>
+          <option value="">Select a focus area</option>
+          <option value="ankle and foot">Ankle and Foot</option>
+          <option value="cervical">Cervical</option>
+          <option value="hip">Hip</option>
+          <option value="knee">Knee</option>
+          <option value="lumbar">Lumbar</option>
+          <option value="shoulder">Shoulder</option>
+          <option value="thoracic">Thoracic</option>
+          <option value="wrist and hand">Wrist and Hand</option>
+          <option value="elbow">Elbow</option>
+          <option value="balance">Balance</option>
+          <option value="core">Core</option>
+        </select>
+      </label>
+      <label>Difficulty Level:
+        <select name="difficulty">
+          <option value="">Select difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="easy to moderate">Easy to Moderate</option>
+          <option value="moderate">Moderate</option>
+          <option value="moderate to hard">Moderate to Hard</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <label>Weight-Bearing Status:
+        <select name="weightBearing">
+          <option value="">Select WB status</option>
+          <option value="non-weight-bearing">Non-weight-bearing</option>
+          <option value="partial weight-bearing">Partial weight-bearing</option>
+          <option value="full weight-bearing">Full weight-bearing</option>
+        </select>
+      </label>
+      <label>Injury Stage:
+        <select name="injuryStage">
+          <option value="">Select stage</option>
+          <option value="acute">Acute</option>
+          <option value="subacute">Subacute</option>
+          <option value="chronic">Chronic</option>
+        </select>
+      </label>
+      <label>Position:
+        <select name="position">
+          <option value="">Select position</option>
+          <option value="lying">Lying</option>
+          <option value="seated">Seated</option>
+          <option value="standing">Standing</option>
+          <option value="standing with support">Standing with Support</option>
+        </select>
+      </label>
+<div class="cf-turnstile" data-sitekey="0x4AAAAAABf-Ev5OA9bAhAcn"></div>
+      <button type="submit">Generate HEP</button>
     </form>
-    <div id="loadingSpinner" style="display: none; margin: 1rem 0; font-size: 0.9rem; color: #007bff;"><em>Loading...</em></div>
+
+    <!-- Loading spinner -->
+    <div id="loadingSpinner" style="display: none; margin: 1rem 0; font-size: 0.9rem; color: #007bff;">
+      <em>Loading...</em>
+    </div>
+
     <h2>HEP Editor</h2>
     <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
-      Your plan will display here with images and descriptions.<br><em>Click any block to edit text directly!</em>
+      Your plan will display here with images and descriptions.
+      <br><em>Click any block to edit text directly!</em>
     </p>
-    <div id="hepOutput" contenteditable="true">
-      <div class="hep-header">
-        <img src="favicon.png" alt="Logo">
-        <span>EasyHEP.com</span>
-      </div>
-      <div id="hepContent"></div>
-    </div>
+    <div id="hepOutput" contenteditable="true"></div>
     <button id="printBtn">Print / Save as PDF</button>
   </div>
+
+  <!-- Focus Area dropdowns -->
   <div class="focus-areas">
     <h2>Add By Focus Area:</h2>
     <div id="focusAreaDropdowns"></div>
+
     <h2>Or Search and Add</h2>
     <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
     <ul id="searchResults"></ul>
   </div>
 </div>
-<div id="pageIcon"><img src="favicon.png" alt="EasyHEP Logo"></div>
-<!-- Footer/Call-to-action -->
+
+<script>
+let manualExercises = [];
+let exerciseDataset = [];
+
+function addManualExercise(ex) {
+  const unifiedEx = {
+    name: ex["Exercise Name"],
+    description: ex["Patient-Friendly Description"],
+    equipment: ex["Equipment Needed"] || "None",
+    setsReps: ex["Typical Sets/Reps/Frequency"],
+    notes: ex["Progression/Regression"] || "",
+    image: ex["Image URL"] || ""
+  };
+  manualExercises.push(unifiedEx);
+  alert(${unifiedEx.name} added!);
+  renderHepOutput();
+}
+
+(async () => {
+  const response = await fetch('./data');
+  exerciseDataset = await response.json();
+
+  const grouped = {};
+  exerciseDataset.forEach(ex => {
+    const area = ex["Focus Area"] || "Other";
+    if (!grouped[area]) grouped[area] = [];
+    grouped[area].push(ex);
+  });
+
+  const dropdownsContainer = document.getElementById('focusAreaDropdowns');
+  Object.keys(grouped).forEach(area => {
+    const container = document.createElement('div');
+    container.className = "dropdown-container";
+
+    const label = document.createElement('span');
+    label.textContent = area;
+    label.style.fontWeight = "bold";
+    label.style.fontSize = "0.85rem";
+    container.appendChild(label);
+
+    const select = document.createElement('select');
+    select.innerHTML = <option value="">Select exercise</option>;
+    grouped[area].forEach(ex => {
+      const opt = document.createElement('option');
+      opt.value = ex["Exercise Name"];
+      opt.textContent = ex["Exercise Name"];
+      select.appendChild(opt);
+    });
+
+    select.addEventListener('change', () => {
+      const selectedName = select.value;
+      if (!selectedName) return;
+      const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
+      if (ex) addManualExercise(ex);
+      select.selectedIndex = 0;
+    });
+
+    container.appendChild(select);
+    dropdownsContainer.appendChild(container);
+  });
+})();
+
+document.getElementById('exerciseSearch').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
+  const resultsList = document.getElementById('searchResults');
+  resultsList.innerHTML = "";
+  results.slice(0, 5).forEach(ex => {
+    const li = document.createElement("li");
+    li.textContent = ex["Exercise Name"];
+    li.addEventListener('click', () => addManualExercise(ex));
+    resultsList.appendChild(li);
+  });
+});
+
+document.getElementById('hepForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Show loading spinner
+  document.getElementById('loadingSpinner').style.display = 'block';
+
+  const token = document.querySelector('.cf-turnstile [name="cf-turnstile-response"]')?.value;
+
+const data = {
+  patientData: {
+    email: e.target.email.value,
+    focusArea: e.target.focusArea.value,
+    difficulty: e.target.difficulty.value,
+    weightBearing: e.target.weightBearing.value,
+    injuryStage: e.target.injuryStage.value,
+    position: e.target.position.value
+  },
+  turnstileToken: token
+};
+
+
+  try {
+    const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    let hepPlan = result.hepPlan || [];
+
+    if (manualExercises.length > 0) {
+      hepPlan = hepPlan.concat(manualExercises);
+    }
+
+    renderHepOutput(hepPlan);
+  } catch (error) {
+    console.error("Error generating HEP:", error);
+    alert("There was an error generating the HEP. Please try again.");
+  } finally {
+    // Hide spinner regardless of success or error
+    document.getElementById('loadingSpinner').style.display = 'none';
+  }
+});
+
+function renderHepOutput(hepPlan = manualExercises) {
+  const hepOutput = document.getElementById('hepOutput');
+  hepOutput.innerHTML = "";
+  hepPlan.forEach((ex, idx) => {
+    const block = document.createElement('div');
+    block.className = "exercise-block";
+    block.contentEditable = true;
+    block.innerHTML = 
+      <strong>${idx + 1}. ${ex.name}</strong><br>
+      <em>${ex.description}</em><br>
+      <span>Equipment: ${ex.equipment}</span><br>
+      <span>Sets/Reps: ${ex.setsReps}</span><br>
+      <span>Notes: ${ex.notes}</span><br>
+      ${ex.image ? <img src="${ex.image}" alt="${ex.name}"> : ""}
+    ;
+    hepOutput.appendChild(block);
+  });
+}
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  window.print();
+});
+</script>
+
 <hr style="margin-top: 3rem;" />
 <div style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #555;">
-  <p style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.5rem;">Want to take your patient care to the next level?</p>
-  <p>Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.</p>
+  <p style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.5rem;">
+    Want to take your patient care to the next level?
+  </p>
+  <p>
+    Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.
+  </p>
   <a href="https://www.relayrtm.com" target="_blank" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">Learn More About RTM</a>
 </div>
+<div id="pageIcon">
+  <img src="favicon.png" alt="EasyHEP Logo">
+</div>
+
 </body>
 </html>
-
