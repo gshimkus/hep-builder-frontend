@@ -7,12 +7,12 @@
   body { font-family: sans-serif; margin: 2rem; }
   label { display: block; margin-top: 1rem; }
   select, button, input { margin-top: 0.5rem; }
-  pre { background: #f4f4f4; padding: 1rem; width: 100%; margin-top: 1rem; white-space: pre-wrap; }
   ul { list-style-type: none; padding: 0; }
   li { cursor: pointer; color: blue; margin: 0.25rem 0; }
   .hidden { display: none; }
   .exercise-block { border-bottom: 1px solid #ddd; padding: 0.5rem 0; }
   .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
+  .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
 </style>
 </head>
 <body>
@@ -98,16 +98,16 @@
 <h2>HEP Editor</h2>
 <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
   Your plan will display here with images and descriptions.
+  <br><em>Click any block to edit text directly!</em>
 </p>
-<div id="hepOutput"></div>
-<button id="downloadBtn" class="hidden">Download Document</button>
+<div id="hepOutput" contenteditable="true"></div>
+<button id="printBtn" class="hidden">Print / Save as PDF</button>
 
 <script>
 let manualExercises = [];
 let exerciseDataset = [];
 
 function addManualExercise(ex) {
-  // Normalize to the same field names as auto-generated
   const unifiedEx = {
     name: ex["Exercise Name"],
     description: ex["Patient-Friendly Description"],
@@ -201,13 +201,12 @@ document.getElementById('hepForm').addEventListener('submit', async (e) => {
   const result = await response.json();
   let hepPlan = result.hepPlan || [];
 
-  // Combine manual exercises and auto-generated
   if (manualExercises.length > 0) {
     hepPlan = hepPlan.concat(manualExercises);
   }
 
   renderHepOutput(hepPlan);
-  document.getElementById('downloadBtn').classList.remove('hidden');
+  document.getElementById('printBtn').classList.remove('hidden');
 });
 
 function renderHepOutput(hepPlan = manualExercises) {
@@ -216,6 +215,7 @@ function renderHepOutput(hepPlan = manualExercises) {
   hepPlan.forEach((ex, idx) => {
     const block = document.createElement('div');
     block.className = "exercise-block";
+    block.contentEditable = true;
     block.innerHTML = `
       <strong>${idx + 1}. ${ex.name}</strong><br>
       <em>${ex.description}</em><br>
@@ -228,23 +228,10 @@ function renderHepOutput(hepPlan = manualExercises) {
   });
 }
 
-// Download final HEP
-document.getElementById('downloadBtn').addEventListener('click', () => {
-  const hepOutputHTML = document.getElementById('hepOutput').innerHTML;
-  const htmlContent = `
-    <html>
-    <head><meta charset="UTF-8"><title>HEP Export</title></head>
-    <body>${hepOutputHTML}</body>
-    </html>
-  `;
-  const blob = new Blob([htmlContent], { type: "text/html" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "HEP.html";
-  link.click();
-  URL.revokeObjectURL(link.href);
+// Print as PDF
+document.getElementById('printBtn').addEventListener('click', () => {
+  window.print();
 });
-
 </script>
 
 <hr style="margin-top: 3rem;" />
