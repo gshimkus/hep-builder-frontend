@@ -32,6 +32,31 @@
     .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
     .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
 
+input[type="email"],
+select {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.25rem;
+}
+button {
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+button:hover {
+  background: #1d4ed8;
+}
+
+
 #pageIcon {
   position: fixed;
   top: 1rem;
@@ -97,6 +122,7 @@
 </head>
 
 <body>
+<div class="max-w-5xl mx-auto px-4">
 <div class="bg-green-100 p-6 rounded-xl shadow mb-6">
   <h1 class="text-3xl font-bold text-center">Home Exercise Program Generator</h1>
   <p class="text-center text-gray-700 mt-2">
@@ -355,6 +381,7 @@ document.getElementById('printBtn').addEventListener('click', () => {
   <a href="https://www.relayrtm.com" target="_blank" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
     Learn More About RTM
   </a>
+</div>
 </div>
 
 
