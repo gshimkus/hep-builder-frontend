@@ -1,229 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <head>
-<script src="https://cdn.tailwindcss.com"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>EasyHEP – Free Physical Therapy Home Exercise Program Generator</title>
   <meta name="description" content="Generate and customize physical therapy HEPs instantly. Free, fast, and printable with images. No login required.">
-
-  <!-- Open Graph / Social -->
-  <meta property="og:title" content="EasyHEP – Free Physical Therapy Home Exercise Program Generator" />
-  <meta property="og:description" content="Generate physical therapy home exercise programs with AI. Download or print HEPs with images." />
-  <meta property="og:url" content="https://easyhep.com" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://easyhep.com/og-image.png" />
-
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://easyhep.com/" />
-
-  <!-- Cloudflare Turnstile -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
-  <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    label { display: block; margin-top: 1rem; }
-    select, button, input { margin-top: 0.5rem; }
-    ul { list-style-type: none; padding: 0; }
-    li { cursor: pointer; color: blue; margin: 0.25rem 0; }
-    .exercise-block { border-bottom: 1px solid #ddd; padding: 0.5rem 0; }
-    .exercise-block img { max-width: 100px; margin: 0.5rem 0; border-radius: 4px; }
-    .exercise-block[contenteditable="true"]:focus { outline: 2px solid #007bff; }
-
-input[type="email"],
-select {
-  width: 100%;
-  max-width: 400px;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-top: 0.25rem;
-}
-button {
-  padding: 0.5rem 1rem;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-button:hover {
-  background: #1d4ed8;
-}
-
-
-#pageIcon {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
-}
-
-#pageIcon img {
-  width: 64px;       
-  height: 64px;
-  border-radius: 12px;
-}
-
-
-
-    .flex-container {
-      display: flex;
-      gap: 2rem;
-      align-items: flex-start;
-    }
-    .generator, .focus-areas {
-      flex: 1;
-    }
-    .focus-areas {
-      border-left: 2px solid #ccc;
-      padding-left: 2rem;
-    }
-
-    #hepOutput {
-      border: 2px solid #007bff;
-      border-radius: 4px;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-    }
-
-    #focusAreaDropdowns {
-      margin-top: 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .dropdown-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    h2 {
-      margin-bottom: 0.25rem;
-    }
-
-    @media print {
-      body * { visibility: hidden; }
-      #hepOutput, #hepOutput * { visibility: visible; }
-      #hepOutput {
-        position: absolute; left: 0; top: 0; width: 100%;
-        margin: 0; padding: 1rem; background: #fff; color: #000;
-      }
-    }
-<link rel="icon" type="image/png" href="favicon.png">
-
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="favicon.png">
 </head>
 
-<body>
-<div class="max-w-5xl mx-auto px-4">
-<div class="bg-green-100 p-6 rounded-xl shadow mb-6">
-  <h1 class="text-3xl font-bold text-center">Home Exercise Program Generator</h1>
-  <p class="text-center text-gray-700 mt-2">
-    Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
-  </p>
-  <p class="text-sm text-center text-gray-500 mt-1">
-    Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.
-  </p>
-</div>
+<body class="bg-white text-gray-800 font-sans">
+  <div class="max-w-5xl mx-auto px-4 py-6">
 
-
-<div class="flex-container">
-  <!-- Generator form and HEP editor -->
-  <div class="generator">
-    <h2>Auto Generator</h2>
-    <form id="hepForm">
-      <label>Email Address (required):
-        <input type="email" name="email" required>
-      </label>
-      <label>Focus Area:
-        <select name="focusArea" required>
-          <option value="">Select a focus area</option>
-          <option value="ankle and foot">Ankle and Foot</option>
-          <option value="cervical">Cervical</option>
-          <option value="hip">Hip</option>
-          <option value="knee">Knee</option>
-          <option value="lumbar">Lumbar</option>
-          <option value="shoulder">Shoulder</option>
-          <option value="thoracic">Thoracic</option>
-          <option value="wrist and hand">Wrist and Hand</option>
-          <option value="elbow">Elbow</option>
-          <option value="balance">Balance</option>
-          <option value="core">Core</option>
-        </select>
-      </label>
-      <label>Difficulty Level:
-        <select name="difficulty">
-          <option value="">Select difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="easy to moderate">Easy to Moderate</option>
-          <option value="moderate">Moderate</option>
-          <option value="moderate to hard">Moderate to Hard</option>
-          <option value="hard">Hard</option>
-        </select>
-      </label>
-      <label>Weight-Bearing Status:
-        <select name="weightBearing">
-          <option value="">Select WB status</option>
-          <option value="non-weight-bearing">Non-weight-bearing</option>
-          <option value="partial weight-bearing">Partial weight-bearing</option>
-          <option value="full weight-bearing">Full weight-bearing</option>
-        </select>
-      </label>
-      <label>Injury Stage:
-        <select name="injuryStage">
-          <option value="">Select stage</option>
-          <option value="acute">Acute</option>
-          <option value="subacute">Subacute</option>
-          <option value="chronic">Chronic</option>
-        </select>
-      </label>
-      <label>Position:
-        <select name="position">
-          <option value="">Select position</option>
-          <option value="lying">Lying</option>
-          <option value="seated">Seated</option>
-          <option value="standing">Standing</option>
-          <option value="standing with support">Standing with Support</option>
-        </select>
-      </label>
-<div class="cf-turnstile" data-sitekey="0x4AAAAAABf-Ev5OA9bAhAcn"></div>
-      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-  Generate HEP
-</button>
-
-    </form>
-
-    <!-- Loading spinner -->
-    <div id="loadingSpinner" style="display: none; margin: 1rem 0; font-size: 0.9rem; color: #007bff;">
-      <em>Loading...</em>
+    <!-- Header -->
+    <div class="bg-green-100 p-6 rounded-xl shadow mb-8">
+      <h1 class="text-3xl font-bold text-center">Home Exercise Program Generator</h1>
+      <p class="text-center text-gray-700 mt-2">
+        Quickly generate or customize Home Exercise Programs using AI. Save time, improve consistency, and support your patients more efficiently.
+      </p>
+      <p class="text-sm text-center text-gray-500 mt-1">
+        Disclaimer: This tool is designed to assist clinicians. Final exercise selection and program design remain the responsibility of the treating clinician.
+      </p>
     </div>
 
-    <h2>HEP Editor</h2>
-    <p style="font-size: 0.9rem; color: #999; margin: 0.25rem 0;">
-      Your plan will display here with images and descriptions.
-      <br><em>Click any block to edit text directly!</em>
-    </p>
-    <div id="hepOutput" contenteditable="true"></div>
-    <button id="printBtn">Print / Save as PDF</button>
-  </div>
+    <!-- Main Layout -->
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Generator -->
+      <div class="w-full lg:w-1/2">
+        <h2 class="text-xl font-semibold mb-4">Auto Generator</h2>
+        <form id="hepForm">
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Email Address (required):</label>
+            <input type="email" name="email" required class="w-full max-w-md border border-gray-300 rounded px-3 py-2" />
+          </div>
 
-  <!-- Focus Area dropdowns -->
-  <div class="focus-areas">
-    <h2>Add By Focus Area:</h2>
-    <div id="focusAreaDropdowns"></div>
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Focus Area:</label>
+            <select name="focusArea" required class="w-full max-w-md border border-gray-300 rounded px-3 py-2">
+              <option value="">Select a focus area</option>
+              <option value="ankle and foot">Ankle and Foot</option>
+              <option value="cervical">Cervical</option>
+              <option value="hip">Hip</option>
+              <option value="knee">Knee</option>
+              <option value="lumbar">Lumbar</option>
+              <option value="shoulder">Shoulder</option>
+              <option value="thoracic">Thoracic</option>
+              <option value="wrist and hand">Wrist and Hand</option>
+              <option value="elbow">Elbow</option>
+              <option value="balance">Balance</option>
+              <option value="core">Core</option>
+            </select>
+          </div>
 
-    <h2>Or Search and Add</h2>
-    <input id="exerciseSearch" type="text" placeholder="Search for exercises..." />
-    <ul id="searchResults"></ul>
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Difficulty Level:</label>
+            <select name="difficulty" class="w-full max-w-md border border-gray-300 rounded px-3 py-2">
+              <option value="">Select difficulty</option>
+              <option value="easy">Easy</option>
+              <option value="easy to moderate">Easy to Moderate</option>
+              <option value="moderate">Moderate</option>
+              <option value="moderate to hard">Moderate to Hard</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Weight-Bearing Status:</label>
+            <select name="weightBearing" class="w-full max-w-md border border-gray-300 rounded px-3 py-2">
+              <option value="">Select WB status</option>
+              <option value="non-weight-bearing">Non-weight-bearing</option>
+              <option value="partial weight-bearing">Partial weight-bearing</option>
+              <option value="full weight-bearing">Full weight-bearing</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Injury Stage:</label>
+            <select name="injuryStage" class="w-full max-w-md border border-gray-300 rounded px-3 py-2">
+              <option value="">Select stage</option>
+              <option value="acute">Acute</option>
+              <option value="subacute">Subacute</option>
+              <option value="chronic">Chronic</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Position:</label>
+            <select name="position" class="w-full max-w-md border border-gray-300 rounded px-3 py-2">
+              <option value="">Select position</option>
+              <option value="lying">Lying</option>
+              <option value="seated">Seated</option>
+              <option value="standing">Standing</option>
+              <option value="standing with support">Standing with Support</option>
+            </select>
+          </div>
+
+          <div class="cf-turnstile mb-4" data-sitekey="0x4AAAAAABf-Ev5OA9bAhAcn"></div>
+
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Generate HEP
+          </button>
+        </form>
+
+        <div id="loadingSpinner" class="text-blue-600 mt-4 hidden"><em>Loading...</em></div>
+
+        <h2 class="text-xl font-semibold mt-8">HEP Editor</h2>
+        <p class="text-sm text-gray-500 mb-2">
+          Your plan will display here with images and descriptions.<br>
+          <em>Click any block to edit text directly!</em>
+        </p>
+        <div id="hepOutput" contenteditable="true" class="border-2 border-blue-500 rounded-lg p-4 bg-white shadow-sm mt-2 space-y-4"></div>
+        <button id="printBtn" class="mt-4 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded">Print / Save as PDF</button>
+      </div>
+
+      <!-- Focus Area Selection -->
+      <div class="w-full lg:w-1/2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-6 lg:pt-0">
+        <h2 class="text-xl font-semibold mb-4">Add By Focus Area:</h2>
+        <div id="focusAreaDropdowns"></div>
+
+        <h2 class="text-xl font-semibold mt-8 mb-2">Or Search and Add</h2>
+        <input id="exerciseSearch" type="text" placeholder="Search for exercises..." class="w-full max-w-md border border-gray-300 rounded px-3 py-2 mb-2" />
+        <ul id="searchResults" class="list-disc pl-5 text-blue-700"></ul>
+      </div>
+    </div>
+
+    <!-- Footer CTA -->
+    <hr class="my-10">
+    <div class="text-center text-gray-700">
+      <p class="text-lg font-semibold mb-2">Want to take your patient care to the next level?</p>
+      <p>Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.</p>
+      <a href="https://www.relayrtm.com" target="_blank" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Learn More About RTM
+      </a>
+    </div>
+
   </div>
-</div>
 
 <script>
 let manualExercises = [];
