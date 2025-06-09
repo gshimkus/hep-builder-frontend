@@ -6,10 +6,43 @@
   <title>EasyHEP – Free Physical Therapy Home Exercise Program Generator</title>
   <meta name="description" content="Generate and customize physical therapy HEPs instantly. Free, fast, and printable with images. No login required.">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #hepOutput, #hepOutput * {
+        visibility: visible;
+      }
+      #hepOutput {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 1.5rem;
+        background: white;
+        color: black;
+      }
+    }
+    .exercise-block {
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background-color: #f9fafb;
+    }
+    .exercise-block img {
+      max-width: 100px;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 
-<body class="bg-white text-gray-800 font-sans">
+<body class="bg-white text-gray-800">
   <div class="max-w-5xl mx-auto px-4 py-6">
 
     <!-- Header -->
@@ -23,7 +56,7 @@
       </p>
     </div>
 
-    <!-- Main Layout -->
+    <!-- Layout -->
     <div class="flex flex-col lg:flex-row gap-8">
       
       <!-- Generator -->
@@ -114,7 +147,7 @@
         <button id="printBtn" class="mt-4 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded">Print / Save as PDF</button>
       </div>
 
-      <!-- Focus Area Selection -->
+      <!-- Manual Add -->
       <div class="w-full lg:w-1/2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-6 lg:pt-0">
         <h2 class="text-xl font-semibold mb-4">Add By Focus Area:</h2>
         <div id="focusAreaDropdowns"></div>
@@ -125,7 +158,7 @@
       </div>
     </div>
 
-    <!-- Footer CTA -->
+    <!-- Footer -->
     <hr class="my-10">
     <div class="text-center text-gray-700">
       <p class="text-lg font-semibold mb-2">Want to take your patient care to the next level?</p>
@@ -137,165 +170,151 @@
 
   </div>
 
-<script>
-let manualExercises = [];
-let exerciseDataset = [];
+  <script>
+    let manualExercises = [];
+    let exerciseDataset = [];
 
-function addManualExercise(ex) {
-  const unifiedEx = {
-    name: ex["Exercise Name"],
-    description: ex["Patient-Friendly Description"],
-    equipment: ex["Equipment Needed"] || "None",
-    setsReps: ex["Typical Sets/Reps/Frequency"],
-    notes: ex["Progression/Regression"] || "",
-    image: ex["Image URL"] || ""
-  };
-  manualExercises.push(unifiedEx);
-  alert(`${unifiedEx.name} added!`);
-  renderHepOutput();
-}
-
-(async () => {
-  const response = await fetch('./data');
-  exerciseDataset = await response.json();
-
-  const grouped = {};
-  exerciseDataset.forEach(ex => {
-    const area = ex["Focus Area"] || "Other";
-    if (!grouped[area]) grouped[area] = [];
-    grouped[area].push(ex);
-  });
-
-  const dropdownsContainer = document.getElementById('focusAreaDropdowns');
-  Object.keys(grouped).forEach(area => {
-    const container = document.createElement('div');
-    container.className = "dropdown-container";
-
-    const label = document.createElement('span');
-    label.textContent = area;
-    label.style.fontWeight = "bold";
-    label.style.fontSize = "0.85rem";
-    container.appendChild(label);
-
-    const select = document.createElement('select');
-    select.innerHTML = `<option value="">Select exercise</option>`;
-    grouped[area].forEach(ex => {
-      const opt = document.createElement('option');
-      opt.value = ex["Exercise Name"];
-      opt.textContent = ex["Exercise Name"];
-      select.appendChild(opt);
-    });
-
-    select.addEventListener('change', () => {
-      const selectedName = select.value;
-      if (!selectedName) return;
-      const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
-      if (ex) addManualExercise(ex);
-      select.selectedIndex = 0;
-    });
-
-    container.appendChild(select);
-    dropdownsContainer.appendChild(container);
-  });
-})();
-
-document.getElementById('exerciseSearch').addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase();
-  const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
-  const resultsList = document.getElementById('searchResults');
-  resultsList.innerHTML = "";
-  results.slice(0, 5).forEach(ex => {
-    const li = document.createElement("li");
-    li.textContent = ex["Exercise Name"];
-    li.addEventListener('click', () => addManualExercise(ex));
-    resultsList.appendChild(li);
-  });
-});
-
-document.getElementById('hepForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // Show loading spinner
-  document.getElementById('loadingSpinner').style.display = 'block';
-
-  const token = document.querySelector('.cf-turnstile [name="cf-turnstile-response"]')?.value;
-
-const data = {
-  patientData: {
-    email: e.target.email.value,
-    focusArea: e.target.focusArea.value,
-    difficulty: e.target.difficulty.value,
-    weightBearing: e.target.weightBearing.value,
-    injuryStage: e.target.injuryStage.value,
-    position: e.target.position.value
-  },
-  turnstileToken: token
-};
-
-
-  try {
-    const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    let hepPlan = result.hepPlan || [];
-
-    if (manualExercises.length > 0) {
-      hepPlan = hepPlan.concat(manualExercises);
+    function addManualExercise(ex) {
+      const unifiedEx = {
+        name: ex["Exercise Name"],
+        description: ex["Patient-Friendly Description"],
+        equipment: ex["Equipment Needed"] || "None",
+        setsReps: ex["Typical Sets/Reps/Frequency"],
+        notes: ex["Progression/Regression"] || "",
+        image: ex["Image URL"] || ""
+      };
+      manualExercises.push(unifiedEx);
+      alert(`${unifiedEx.name} added!`);
+      renderHepOutput();
     }
 
-    renderHepOutput(hepPlan);
-  } catch (error) {
-    console.error("Error generating HEP:", error);
-    alert("There was an error generating the HEP. Please try again.");
-  } finally {
-    // Hide spinner regardless of success or error
-    document.getElementById('loadingSpinner').style.display = 'none';
-  }
-});
+    (async () => {
+      const response = await fetch('./data');
+      exerciseDataset = await response.json();
 
-function renderHepOutput(hepPlan = manualExercises) {
-  const hepOutput = document.getElementById('hepOutput');
-  hepOutput.innerHTML = `
-  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-    <img src="favicon.png" alt="EasyHEP Logo" style="width: 48px; height: 48px; border-radius: 8px;">
-    <h2 style="margin: 0;">EasyHEP.com – Home Exercise Program</h2>
-  </div>
-`;
-  hepPlan.forEach((ex, idx) => {
-    const block = document.createElement('div');
-    block.className = "exercise-block";
-    block.contentEditable = true;
-    block.innerHTML = `
-      <strong>${idx + 1}. ${ex.name}</strong><br>
-      <em>${ex.description}</em><br>
-      <span>Equipment: ${ex.equipment}</span><br>
-      <span>Sets/Reps: ${ex.setsReps}</span><br>
-      <span>Notes: ${ex.notes}</span><br>
-      ${ex.image ? `<img src="${ex.image}" alt="${ex.name}">` : ""}
-    `;
-    hepOutput.appendChild(block);
-  });
-}
+      const grouped = {};
+      exerciseDataset.forEach(ex => {
+        const area = ex["Focus Area"] || "Other";
+        if (!grouped[area]) grouped[area] = [];
+        grouped[area].push(ex);
+      });
 
-document.getElementById('printBtn').addEventListener('click', () => {
-  window.print();
-});
-</script>
+      const dropdownsContainer = document.getElementById('focusAreaDropdowns');
+      Object.keys(grouped).forEach(area => {
+        const container = document.createElement('div');
+        container.className = "mb-4";
 
-<hr style="margin-top: 3rem;" />
-<div class="text-center mt-12 text-gray-700">
-  <p class="text-lg font-semibold mb-2">Want to take your patient care to the next level?</p>
-  <p>Our Remote Therapeutic Monitoring (RTM) platform will keep your patients engaged with their HEP and increase reimbursements, 100% free to implement.</p>
-  <a href="https://www.relayrtm.com" target="_blank" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-    Learn More About RTM
-  </a>
-</div>
-</div>
+        const label = document.createElement('span');
+        label.textContent = area;
+        label.className = "block font-medium text-sm mb-1";
+        container.appendChild(label);
 
+        const select = document.createElement('select');
+        select.innerHTML = `<option value="">Select exercise</option>`;
+        grouped[area].forEach(ex => {
+          const opt = document.createElement('option');
+          opt.value = ex["Exercise Name"];
+          opt.textContent = ex["Exercise Name"];
+          select.appendChild(opt);
+        });
 
+        // Style it manually
+        select.style.cssText = "width: 100%; max-width: 300px; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px;";
+
+        select.addEventListener('change', () => {
+          const selectedName = select.value;
+          if (!selectedName) return;
+          const ex = grouped[area].find(e => e["Exercise Name"] === selectedName);
+          if (ex) addManualExercise(ex);
+          select.selectedIndex = 0;
+        });
+
+        container.appendChild(select);
+        dropdownsContainer.appendChild(container);
+      });
+    })();
+
+    document.getElementById('exerciseSearch').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const results = exerciseDataset.filter(ex => ex["Exercise Name"].toLowerCase().includes(query));
+      const resultsList = document.getElementById('searchResults');
+      resultsList.innerHTML = "";
+      results.slice(0, 5).forEach(ex => {
+        const li = document.createElement("li");
+        li.textContent = ex["Exercise Name"];
+        li.className = "cursor-pointer hover:underline";
+        li.addEventListener('click', () => addManualExercise(ex));
+        resultsList.appendChild(li);
+      });
+    });
+
+    document.getElementById('hepForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('loadingSpinner').style.display = 'block';
+      const token = document.querySelector('.cf-turnstile [name="cf-turnstile-response"]')?.value;
+
+      const data = {
+        patientData: {
+          email: e.target.email.value,
+          focusArea: e.target.focusArea.value,
+          difficulty: e.target.difficulty.value,
+          weightBearing: e.target.weightBearing.value,
+          injuryStage: e.target.injuryStage.value,
+          position: e.target.position.value
+        },
+        turnstileToken: token
+      };
+
+      try {
+        const response = await fetch('https://hep-worker.griffin-shimkus.workers.dev/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        let hepPlan = result.hepPlan || [];
+
+        if (manualExercises.length > 0) {
+          hepPlan = hepPlan.concat(manualExercises);
+        }
+
+        renderHepOutput(hepPlan);
+      } catch (error) {
+        console.error("Error generating HEP:", error);
+        alert("There was an error generating the HEP. Please try again.");
+      } finally {
+        document.getElementById('loadingSpinner').style.display = 'none';
+      }
+    });
+
+    function renderHepOutput(hepPlan = manualExercises) {
+      const hepOutput = document.getElementById('hepOutput');
+      hepOutput.innerHTML = `
+        <div class="flex items-center gap-4 mb-4">
+          <img src="favicon.png" alt="EasyHEP Logo" class="w-12 h-12 rounded-lg">
+          <h2 class="text-xl font-bold">EasyHEP.com – Home Exercise Program</h2>
+        </div>
+      `;
+      hepPlan.forEach((ex, idx) => {
+        const block = document.createElement('div');
+        block.className = "exercise-block";
+        block.contentEditable = true;
+        block.innerHTML = `
+          <strong>${idx + 1}. ${ex.name}</strong><br>
+          <em>${ex.description}</em><br>
+          <span>Equipment: ${ex.equipment}</span><br>
+          <span>Sets/Reps: ${ex.setsReps}</span><br>
+          <span>Notes: ${ex.notes}</span><br>
+          ${ex.image ? `<img src="${ex.image}" alt="${ex.name}">` : ""}
+        `;
+        hepOutput.appendChild(block);
+      });
+    }
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+      window.print();
+    });
+  </script>
 </body>
 </html>
